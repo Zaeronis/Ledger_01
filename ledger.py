@@ -68,6 +68,14 @@ total REAL,
 datetime TEXT
 '''
 
+logs = '''
+lid INTEGER PRIMARY KEY AUTOINCREMENT,
+uid TEXT,
+action TEXT,
+details TEXT
+datetime TEXT,
+'''
+
 ####################Classes####################
 
 ####################
