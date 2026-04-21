@@ -1,4 +1,5 @@
 ####################Imports####################
+from turtledemo.sorting_animate import show_text
 
 import argon2 as a
 import sqlite3 as sql
@@ -9,6 +10,9 @@ import datetime as dt
 import random as r
 import re
 import string as st
+from tkinter import *
+from tkinter import messagebox
+from PIL import ImageTk, Image
 
 ####################Objects####################
 
@@ -78,7 +82,7 @@ datetime TEXT,
 
 ####################Classes####################
 
-####################
+########################################
 class Ledger:
     def __init__(self):
         pass
@@ -105,14 +109,11 @@ class Ledger:
         return None
 
 l = Ledger()
-####################
+########################################
 class User:
     def __init__(self):
         pass
 
-    ###########Retreival Methods###########
-
-    ###########Creation Methods###########
     def create_uid(self):
         conn, c = l.open_ledger()
         while True:
@@ -235,15 +236,13 @@ class User:
             l.close_ledger(conn, c)
         return uid, username, first_name, last_name, password
 
-    def user_login(self):
+    def user_login(self, username, password):
         conn, c = l.open_ledger()
         condition = 'True' in c.execute(f'SELECT logged_in FROM ledger_users').fetchall()
         if condition:
             print('You are already logged in. Please log out to log into an account.')
             return None
         else:
-            username = input('Please enter your username: ')
-            password = input('Please enter your password: ')
             if self.validate_password(username, password):
                 c.execute(f'UPDATE ledger_users SET logged_in = "True" WHERE uid = "{self.get_uid(username)}"')
                 conn.commit()
@@ -271,12 +270,56 @@ class User:
 
 
 u = User()
-####################
+########################################
 class Account:
     def __init__(self):
         pass
 
 ac = Account()
+########################################
+class Login_Page:
+    def __init__(self):
+        pass
+
+    def login(self):
+        pass
+
+####################GUI####################
+
+
+#####Root Variables####################
+
+root = Tk()
+root.title("Ledger Application v.0.0.2")
+root.iconbitmap("image.ico")
+root.geometry("1280x800")
+
+#####Login Page####################
+
+ledger_logo = Image.open("image.png")
+ledger_logo_resize = ledger_logo.resize((300, 300))
+logo_image = ImageTk.PhotoImage(ledger_logo_resize)
+logo = Label(root, image=logo_image)
+logo.pack()
+
+login_frame = LabelFrame(root, text="User Login", padx=10, pady=10)
+username_label = Label(login_frame, text="Username:")
+username_entry = Entry(login_frame)
+password_label = Label(login_frame, text="Password:")
+password_entry = Entry(login_frame, show="*")
+login_button = Button(login_frame, text="Login", command=lambda: u.user_login(username_entry.get(), password_entry.get()))
+
+login_frame.pack()
+username_label.grid(row=0, column=0, sticky=W)
+username_entry.grid(row=1, column=0)
+password_label.grid(row=2, column=0, sticky=W)
+password_entry.grid(row=3, column=0)
+login_button.grid(row=4, column=0)
+
+#####Runtime####################
+
+root.mainloop()
+
 ####################Functions####################
 
 
