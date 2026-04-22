@@ -4,9 +4,11 @@ from PIL import ImageTk, Image
 import sqlite3 as sql
 from accounts import *
 from ledger import *
-from gui.login import *
 from users import *
 from gui.user_home import *
+from main import clear_window as cw
+
+uh = User_Home()
 
 class Login_Page:
     def __init__(self, root):
@@ -21,6 +23,8 @@ class Login_Page:
             var1.delete(0, END)
             var2.delete(0, END)
             messagebox.showinfo("Success", "Login successful.")
+            cw(self.root)
+            uh.build_userhome()
             return True
 
     def logout(self, var):
@@ -38,7 +42,7 @@ class Login_Page:
         ucw.focus_set()
         ucw.grab_set()
 
-        ucw_frame = LabelFrame(ucw, padx=10, pady=10)
+        ucw_frame = LabelFrame(ucw,padx=10, pady=10)
         usrname_label = Label(ucw_frame, text="Username:", font=("Arial", 20))
         usrname_entry = Entry(ucw_frame)
         usrname = StringVar()
@@ -74,6 +78,9 @@ class Login_Page:
             if result == 0:
                 messagebox.showinfo('Success', 'User created and logged in successfully')
                 ucw.destroy()
+                cw(self.root)
+                uh.build_userhome()
+
             elif result == 1:
                 messagebox.showerror('Error', 'Currently logged in. Please log out to create a new user.')
             else:
@@ -154,7 +161,6 @@ class Login_Page:
         lname_entry.bind('<KeyRelease>', lname_validation)
         password_entry.bind('<KeyRelease>', pass_validation)
         password_confirm_entry.bind('<KeyRelease>', passcon_validation)
-
         return
 
     def build_login(self):
