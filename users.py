@@ -30,56 +30,31 @@ class User:
         l.close_ledger(conn, c)
         return uid
 
-    def create_username(self):
+    def validate_username(self, uname):
         conn, c = l.open_ledger()
-        while True:
-            uname = input('Please enter a username:\n')
-            conditions = not re.fullmatch(r'((?=.*[a-z])|(?=.*[A-Z]))[A-Za-z0-9_!~@#]{3,16}', uname)
-            if conditions:
-                print('''
-                \nUsername must be between 3 and 16 character, 
-                contain at least one or more letters or numbers,
-                and the following characters:   _   @   #   !   ~''')
-                pass
-            else:
-                break
-        return uname
+        condition1 = not re.fullmatch(r'((?=.*[a-z])|(?=.*[A-Z]))[A-Za-z0-9_!~@#]{3,16}', uname)
+        condition2 = uname in c.execute('SELECT username FROM ledger_users').fetchall()
+        l.close_ledger(conn, c)
+        if condition1 or condition2:
+            return False
+        else:
+            return True
 
-    def create_name(self, pos):
-        while True:
-            name = input(f'Please enter your {pos} name: ')
-            condition = not re.fullmatch(r'[A-Za-z]+', name)
-            if condition:
-                print('Name can only contain only letters.\n')
-                pass
-            else:
-                break
-        return name
+    def validate_name(self, name):
+        condition = not re.fullmatch(r'[A-Za-z]+', name)
+        if condition:
+            return False
+        else:
+            return True
 
-    def create_password(self):
-        while True:
-            password = input('Please enter a password:\n')
-            conditions = not re.fullmatch(r'(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}', password)
-            if conditions:
-                print('''Password must be at least
-                 8 - 32 characters long, have at least
-                 one capital and lowercase letter
-                 each, one number, and one
-                 special character.\n''')
-                pass
-            else:
-                password = ph.hash(password)
-                confirmation = input('Please confirm your password:\n')
-                try:
-                    if ph.verify(password, confirmation):
-                        print("Success! Password saved.")
-                except:
-                    print("Passwords do not match. Please try again.")
-                    continue
-                break
-        return password
+    def validate_password(self, password):
+        conditions = not re.fullmatch(r'(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}', password)
+        if conditions:
+            return False
+        else:
+            return True
 
-    def validate_password(self, uname, psswd):
+    def password_validation(self, uname, psswd):
         conn, c = l.open_ledger()
         uid = self.get_uid(uname)
         password = c.execute(f'SELECT password FROM user_passwords WHERE uid = "{uid}"').fetchone()[0]
@@ -95,7 +70,7 @@ class User:
         conn, c = l.open_ledger()
         uid = self.get_uid(uname)
         psswd = input('Please enter your current password: ')
-        if not self.validate_password(uname, psswd):
+        if not self.password_validation(uname, psswd):
             print('Invalid password.')
             l.close_ledger(conn, c)
             return None
