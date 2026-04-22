@@ -60,7 +60,22 @@ class Login_Page:
         pass_confirm = StringVar()
         pass_confirm.set('')
         pass_confirm_validate = Label(ucw_frame, textvariable=pass_confirm, font=('Arial', 12))
-        conifrm_btn = Button(ucw, text='Confirm')
+
+        def user_create():
+            usr = usrname_entry.get()
+            fnm = fname_entry.get()
+            lnm = lname_entry.get()
+            pss = password_entry.get()
+            result = u.create_user(usr, fnm, lnm, pss)
+            if result == 0:
+                messagebox.showinfo('Success', 'User created and logged in successfully')
+                ucw.destroy()
+            elif result == 1:
+                messagebox.showerror('Error', 'Currently logged in. Please log out to create a new user.')
+            else:
+                messagebox.showerror('Error', 'Something went wrong.')
+
+        conifrm_btn = Button(ucw, text='Confirm', command=user_create)
 
         ucw_frame.pack(fill=X)
         ucw_frame.grid_columnconfigure(0, weight=1)

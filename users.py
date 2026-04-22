@@ -83,25 +83,24 @@ class User:
             l.close_ledger(conn, c)
             return password
 
-    def create_user(self):
-        conn, c = l.open_ledger()
-        condition = 'True' in c.execute(f'SELECT logged_in FROM ledger_users').fetchall()
-        if condition:
-            print('Please log out before creating a new user.')
-            return None
-        else:
-            uid = self.create_uid()
-            username = self.create_username()
-            first_name = self.create_name('first')
-            last_name = self.create_name('last')
-            password = self.create_password()
-            logged_in = 'True'
-            datetime = str(dt.datetime.now())
-            c.execute(f'INSERT INTO ledger_users VALUES (?,?,?,?,?,?)', (uid, username, first_name, last_name, logged_in, datetime))
-            c.execute(f'INSERT INTO user_passwords VALUES (?,?,?)', (uid, password, datetime))
-            conn.commit()
+    def create_user(self, username, first_name, last_name, password):
+        try:
+            conn, c = l.open_ledger()
+            condition = 'True' in c.execute(f'SELECT logged_in FROM ledger_users').fetchall()
+            if condition:
+                return 1
+            else:
+                uid = self.create_uid()
+                logged_in = 'True'
+                datetime = str(dt.datetime.now())
+                c.execute(f'INSERT INTO ledger_users VALUES (?,?,?,?,?,?)', (uid, username, first_name, last_name, logged_in, datetime))
+                c.execute(f'INSERT INTO user_passwords VALUES (?,?,?)', (uid, password, datetime))
+                conn.commit()
+                l.close_ledger(conn, c)
+            return 0
+        except:
             l.close_ledger(conn, c)
-        return uid, username, first_name, last_name, password
+            return 2
 
     def user_login(self, username, password):
         conn, c = l.open_ledger()
