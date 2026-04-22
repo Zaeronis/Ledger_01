@@ -112,3 +112,4 @@ class Ledger:
         return None
 
 l = Ledger()
+#l.first_time_setup()

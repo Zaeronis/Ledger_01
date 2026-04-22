@@ -2,11 +2,15 @@ from tkinter import *
 from tkinter import messagebox, simpledialog, font
 from PIL import ImageTk, Image
 import sqlite3 as sql
+from accounts import *
+from ledger import *
+from gui.login import *
 from users import *
+from gui.user_home import *
 
 class Login_Page:
-    def __init__(self):
-        pass
+    def __init__(self, root):
+        self.root = root
 
     def login(self, var1, var2):
         if u.user_login(var1.get(), var2.get()) is False:
@@ -27,7 +31,7 @@ class Login_Page:
 
     def user_creation(self):
 
-        ucw = Toplevel(root, padx=20, pady=20)
+        ucw = Toplevel(self.root, padx=20, pady=20)
         ucw.title("User Creation")
         ucw.geometry("450x615")
         ucw.attributes('-topmost', True)
@@ -153,33 +157,27 @@ class Login_Page:
 
         return
 
-lp = Login_Page()
+    def build_login(self):
+        logo = ImageTk.PhotoImage(Image.open("gui/ledger.png").resize((300, 300)))
+        logo_label = Label(self.root, image=logo)
+        logo_label.image = logo
+        logo_label.pack()
+        Label(self.root, text="Ledger Application v.0.0.2", pady=20, font=('Times', 48, 'bold italic')).pack()
 
-root = Tk()
-root.title("Ledger Application v.0.0.2")
-root.geometry("1280x800")
-root.configure(pady=50)
+        login_frame = LabelFrame(self.root, text="User Login", padx=10, pady=10)
+        username_label = Label(login_frame, text="Username:")
+        username_entry = Entry(login_frame)
+        password_label = Label(login_frame, text="Password:")
+        password_entry = Entry(login_frame, show='\u2022')
+        login_button = Button(login_frame, text="Login", command=lambda: self.login(username_entry, password_entry))
+        logout_button = Button(self.root, text="Logout", command=lambda: self.logout(username_entry))
 
-logo = ImageTk.PhotoImage(Image.open("ledger.png").resize((300, 300)))
-Label(root, image=logo).pack()
-Label(root, text="Ledger Application v.0.0.2", pady=20, font=('Times', 48, 'bold italic')).pack()
+        login_frame.pack()
+        username_label.grid(row=0, column=0, sticky=W)
+        username_entry.grid(row=1, column=0)
+        password_label.grid(row=2, column=0, sticky=W)
+        password_entry.grid(row=3, column=0)
+        login_button.grid(row=4, column=0)
+        logout_button.pack()
 
-login_frame = LabelFrame(root, text="User Login", padx=10, pady=10)
-username_label = Label(login_frame, text="Username:")
-username_entry = Entry(login_frame)
-password_label = Label(login_frame, text="Password:")
-password_entry = Entry(login_frame, show='\u2022')
-login_button = Button(login_frame, text="Login", command=lambda: lp.login(username_entry, password_entry))
-logout_button = Button(root, text="Logout", command=lambda: lp.logout(username_entry))
-
-login_frame.pack()
-username_label.grid(row=0, column=0, sticky=W)
-username_entry.grid(row=1, column=0)
-password_label.grid(row=2, column=0, sticky=W)
-password_entry.grid(row=3, column=0)
-login_button.grid(row=4, column=0)
-logout_button.pack()
-
-Button(root, text="Create User", command=lp.user_creation).pack()
-
-root.mainloop()
+        Button(self.root, text="Create User", command=self.user_creation).pack()
